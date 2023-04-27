@@ -1,24 +1,32 @@
 import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import UserRideScreen from "../Components/UserRideScreen";
 import { Context as AuthContext } from "../Context/AuthContext";
 
 const MyRideBookedScreen = () => {
-  const { state } = React.useContext(AuthContext);
+  const { state: {userInfo} } = React.useContext(AuthContext);
+  const { booked_rides } = userInfo.rideHistory
+  const { payload } = userInfo;
 
+  React.useEffect(() => {
+    console.log(
+      "00------------------------------ My Booked Ride Screen ------------------------------00"
+    );
+    console.log(booked_rides);
+  }, [booked_rides]);
   return (
     <UserRideScreen
       title="My Booked Rides"
-      origin={"Bhaktapur, Nepal"}
-      destination={"Kathmandu, Nepal"}
-      date={"12/12/2020"}
-      time={"12:00 PM"}
+      origin={booked_rides[0].originName}
+      destination={booked_rides[0].destinationName}
+      date={booked_rides[0].date}
+      time={booked_rides[0].time}
       name={"Hari Dahal"}
       nameLabel={"Rider Name"}
       phoneNumber={"+977 9871234560"}
       phoneLabel={ "Phone Number" }
       showUserInfo={true}
-      vehicleModel="CRF Rally 250"
+      vehicleModel={booked_rides[0].vehicleType}
       vehicleModelName="Vehicle Model"
     />
   );

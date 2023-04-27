@@ -2,6 +2,7 @@ import createDataContext from "./createDataContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import BackEnd from "../API/BackEnd";
 import { navigateTo } from "../navigationRef";
+import CookieManager from "@react-native-cookies/cookies";
 
 const authReducer = (state, action) => {
   switch (action.type) {
@@ -28,7 +29,14 @@ const authReducer = (state, action) => {
       return { ...state, errorMessage: "" };
 
     case "sign_out":
-      return { ...state, token: null, errorMessage: "", isSignedIn: false, OTPInfo: null, userInfo: null };
+      return {
+        ...state,
+        token: null,
+        errorMessage: "",
+        isSignedIn: false,
+        OTPInfo: null,
+        userInfo: null,
+      };
 
     case "verify_otp":
       return { ...state, errorMessage: "", OTPInfo: action.payload };
@@ -105,8 +113,6 @@ const signout = (dispatch) => async () => {
     await AsyncStorage.removeItem("token");
     console.log("tokenRemoved");
     dispatch({ type: "sign_out" });
-    console.log("SignedOut");
-    navigateTo("Unauthenticated");
   } catch (error) {
     console.log(error);
   }
@@ -149,6 +155,8 @@ const sendRiderInfo = (dispatch) => async (riderInfo) => {
         "Content-Type": "multipart/form-data",
       },
     });
+    console.log("Rider Info Axios response:\n");
+    console.log(response.data);
     dispatch({ type: "verify_otp", payload: response.data });
   } catch (error) {
     console.log(error);
@@ -161,12 +169,14 @@ const sendRiderInfo = (dispatch) => async (riderInfo) => {
 };
 const sendVehicleInfo = (dispatch) => async (vehicleInfo) => {
   try {
-    const response = await BackEnd.post("/vehicleinfo", vehicleInfo, {
+    const response = await BackEnd.post("/vehicleinformation", vehicleInfo, {
       headers: {
         "Content-Type": "multipart/form-data",
       },
     });
-    dispatch({ type: "verify_otp", payload: response.data });
+    console.log("Vehicle Info Axios response:\n");
+    console.log(response.data);
+    dispatch({ type: "signin", payload: response.data });
   } catch (error) {
     console.log(error);
     dispatch({
@@ -182,6 +192,27 @@ const clearOTPState = (dispatch) => () => {
   dispatch({ type: "verify_otp", payload: null });
 };
 
+// Cheating
+const updateState = (dispatch) => async (formData) => {
+  try {
+    const response = await BackEnd.post("/rideStatus", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    console.log("Ride Status Axios response:\n");
+    console.log(response.data);
+    dispatch({ type: "signin", payload: response.data });
+  } catch (error) {
+    console.log(error);
+    dispatch({
+      type: "add_error",
+
+      payload: "Something went wrong with Sign In",
+    });
+  }
+};
+
 export const { Provider, Context } = createDataContext(
   authReducer,
   {
@@ -195,6 +226,7 @@ export const { Provider, Context } = createDataContext(
     sendRiderInfo,
     sendVehicleInfo,
     clearOTPState,
+    updateState
   },
   {
     token: null,

@@ -7,6 +7,7 @@ import SearchButton from "./SearchButton";
 import SearchContainer from "./SearchContainer";
 import { Context as LocationContext } from "../Context/LocationContext";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { Context as AuthContext } from "../Context/AuthContext";
 
 const BikeScreen = ({ navigation, incomingVehicleType, addRides }) => {
   // To send
@@ -33,6 +34,9 @@ const BikeScreen = ({ navigation, incomingVehicleType, addRides }) => {
   const originRef = React.useRef();
   const destinationRef = React.useRef();
 
+  //Get UserId
+  const { state } = React.useContext(AuthContext);
+
   const onChangeDate = (event, selectedDate) => {
       setDepartureDate(selectedDate);
       setShow(false);
@@ -55,6 +59,7 @@ const BikeScreen = ({ navigation, incomingVehicleType, addRides }) => {
         originName,
         originPlaceId,
         vehicleType,
+        userId : state.userInfo.payload.id,
       });
       navigation.navigate("CarRides");
     }
@@ -105,7 +110,8 @@ const BikeScreen = ({ navigation, incomingVehicleType, addRides }) => {
                   destinationName,
                   originName,
                   date: departureDate.toDateString(),
-                  time: formatAMPM(departureTime)
+                  time: formatAMPM(departureTime),
+                  userId: state.userInfo.payload.id,
                 });
                 navigation.navigate("CarRides");
               },

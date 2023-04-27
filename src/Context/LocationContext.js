@@ -15,14 +15,40 @@ const locationReducer = (state, action) => {
 };
 
 const searchRides = (dispatch) => {
-  return async ({destination, origin, destinationName, destinationPlaceId, originName, originPlaceId, vehicleType}) => {
+  return async ({
+    destination,
+    origin,
+    destinationName,
+    destinationPlaceId,
+    originName,
+    originPlaceId,
+    vehicleType,
+    userId,
+  }) => {
     try {
-      console.log("-------------- Searching Rides ---------------")
-      console.log({ destination, origin, destinationName, destinationPlaceId, originName, originPlaceId, vehicleType })
-      const response = await BackEnd.post("/searchRides", { destination, origin, destinationName, destinationPlaceId, originName, originPlaceId, vehicleType });
+      console.log("-------------- Searching Rides ---------------");
+      console.log({
+        destination,
+        origin,
+        destinationName,
+        destinationPlaceId,
+        originName,
+        originPlaceId,
+        vehicleType,
+        userId,
+      });
+      const response = await BackEnd.post("/searchRides", {
+        destination,
+        origin,
+        destinationName,
+        destinationPlaceId,
+        originName,
+        originPlaceId,
+        vehicleType,
+        userId,
+      });
       console.log("Axios response:\n");
       console.log(response.data);
-
       dispatch({ type: "search_rides", payload: response.data });
     } catch (error) {
       dispatch({
@@ -43,10 +69,22 @@ const saveRide = (dispatch) => {
     destinationName,
     originName,
     date,
-    time
+    time,
+    userId,
   }) => {
     try {
-      console.log({destination, origin, destinationPlaceId, originPlaceId, vehicleType, destinationName, originName, time, date})
+      console.log({
+        destination,
+        origin,
+        destinationPlaceId,
+        originPlaceId,
+        vehicleType,
+        destinationName,
+        originName,
+        time,
+        date,
+        userId,
+      });
       const response = await BackEnd.post("/addRide", {
         destination,
         origin,
@@ -56,7 +94,8 @@ const saveRide = (dispatch) => {
         destinationName,
         originName,
         date,
-        time
+        time,
+        userId,
       });
 
       dispatch({ type: "add_ride", payload: response.data });
@@ -72,5 +111,5 @@ const saveRide = (dispatch) => {
 export const { Provider, Context } = createDataContext(
   locationReducer,
   { searchRides, saveRide },
-  { availableRides: [], recording: false, errorMessage: "" }
+  { availableRides: null, recording: false, errorMessage: "" }
 );

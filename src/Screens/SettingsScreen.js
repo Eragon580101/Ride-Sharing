@@ -17,6 +17,7 @@ const SettingsScreen = ({ navigation }) => {
     signout,
   } = useContext(AuthContext);
 
+
   const { payload } = userInfo;
 
   console.log(
@@ -60,7 +61,7 @@ const SettingsScreen = ({ navigation }) => {
             title={"My Offered Rides"}
             onPress={() => navigation.navigate("MyOfferedRide")}
           />
-          {payload.isRider && (
+          {!payload.isRider && (
             <>
               <Spacer bottomBorderWidth={1} />
               <ListCard

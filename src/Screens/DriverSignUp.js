@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, View } from "react-native";
 import { Context as AuthContext } from "../Context/AuthContext";
 import Spacer from "../Components/Spacer";
 import ImagePicker from "../Components/ImagePicker";
+import Dropdown from "react-native-input-select";
 
 const DriverSignUp = () => {
   const [licenseNumber, setLicenseNumber] = React.useState("");
@@ -25,7 +26,12 @@ const DriverSignUp = () => {
   const [citizenshipImageBack, setCitizenshipImageBack] = React.useState(null);
   const [idConfirmationImage, setIdConfirmationImage] = React.useState(null);
 
-  const { state, sendRiderInfo,sendVehicleInfo } = React.useContext(AuthContext);
+
+  //DRop down
+  const [vehicleType, setVehicleType] = React.useState("Nepal");
+
+  const { state, sendRiderInfo, sendVehicleInfo } =
+    React.useContext(AuthContext);
 
   const addRider = () => {
     const RiderInfo = new FormData();
@@ -45,8 +51,10 @@ const DriverSignUp = () => {
       name: "idConfirmationImage.jpg",
       type: "image/jpeg",
     });
-    RiderInfo.append("userId", state.userInfo.id);
-    console.log("----------------------- RiderInfo ----------------------------------");
+    RiderInfo.append("userId", state.userInfo.payload.id);
+    console.log(
+      "----------------------- RiderInfo ----------------------------------"
+    );
     console.log(RiderInfo);
     sendRiderInfo(RiderInfo);
   };
@@ -81,10 +89,20 @@ const DriverSignUp = () => {
       type: "image/jpeg",
     });
     vehicleInfo.append("transportYears", transportYears);
-    vehicleInfo.append("userId", state.userInfo.id)
-    console.log("----------------------- vehicleInfo ----------------------------------");
+    vehicleInfo.append("userId", state.userInfo.payload.id);
+    vehicleInfo.append("vehicleType", vehicleType);
+    console.log(
+      "----------------------- vehicleInfo ----------------------------------"
+    );
     console.log(vehicleInfo);
     sendVehicleInfo(vehicleInfo);
+  };
+
+  const addToDatabase = async () => {
+    addRider();
+    addVehicle();
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    () => navigation.navigate("SettingsScreen");
   };
 
   if (NextPage) {
@@ -108,6 +126,21 @@ const DriverSignUp = () => {
             leftIcon={{ type: "font-awesome", name: "calendar" }}
           />
 
+          <Dropdown
+            label="Select a Vehicle Type"
+            labelStyle={{ fontWeight: "bold", marginLeft: 10, fontSize: 15}}
+            placeholder="Select an option..."
+            options={[
+              { name: "Bike", code: "Bike" },
+              { name: "Car", code: "Car" },
+            ]}
+            optionLabel={"name"}
+            optionValue={"code"}
+            selectedValue={vehicleType}
+            onValueChange={(value) => setVehicleType(value)}
+            primaryColor={"green"}
+            dropdownStyle={{ borderWidth: 1, borderColor: "#00000052", padding: 1, height: 40, width: 320, marginHorizontal: 10 }}
+          />
           <ImagePicker
             image={licensePhoto}
             setImage={setLicensePhoto}
@@ -141,10 +174,7 @@ const DriverSignUp = () => {
           <Spacer />
           <Button
             title="Submit"
-            onPress={() => {
-              addRider();
-              addVehicle();
-            }}
+            onPress={() => addToDatabase()}
             color="#4AA96C"
           />
           <View style={{ marginVertical: 2 }} />
@@ -219,6 +249,16 @@ const styles = StyleSheet.create({
     fontSize: 12,
     padding: 10,
     color: "red",
+  },
+  inputAndroid: {
+    fontSize: 16,
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderWidth: 0.5,
+    borderColor: "purple",
+    borderRadius: 8,
+    color: "black",
+    paddingRight: 30, // to ensure the text is never behind the icon
   },
 });
 

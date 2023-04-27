@@ -1,10 +1,5 @@
 import React from "react";
-import {
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { StyleSheet, View, Text, TouchableOpacity } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
 import { Context as AuthContext } from "../Context/AuthContext";
 import { GOOGLE_MAPS_API_KEY } from "@env";
@@ -14,21 +9,23 @@ const SearchContainer = ({
   setDestination,
   setDestinationPlaceId,
   setOriginPlaceId,
-  handleSearch, 
+  handleSearch,
   handleOfferRide,
   originRef,
   setDestinationName,
   setOriginName,
-  destinationRef
+  destinationRef,
 }) => {
-  const { state } = React.useContext(AuthContext);
+  const {
+    state: { userInfo },
+  } = React.useContext(AuthContext);
 
-  
+  console.log("userInfo", userInfo)
 
   return (
     <View style={styles.searchContainer}>
       <GooglePlacesAutocomplete
-      ref={originRef}
+        ref={originRef}
         placeholder="Origin Point"
         fetchDetails
         onPress={(data, details = null) => {
@@ -61,9 +58,14 @@ const SearchContainer = ({
         <TouchableOpacity style={styles.button} onPress={handleSearch}>
           <Text style={styles.buttonText}>View Rides</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.button, styles.offerRide]} onPress={handleOfferRide}>
-          <Text style={styles.buttonText}>Offer Rides</Text>
-        </TouchableOpacity>
+        {userInfo.payload.isRider && (
+          <TouchableOpacity
+            style={[styles.button, styles.offerRide]}
+            onPress={handleOfferRide}
+          >
+            <Text style={styles.buttonText}>Offer Rides</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );

@@ -1,36 +1,39 @@
 import React from "react";
-import { Alert } from "react-native";
-import { TouchableOpacity } from "react-native";
-import { ScrollView } from "react-native";
-import { Image } from "react-native";
-import { Linking } from "react-native";
-import { View, Text, StyleSheet } from "react-native";
-import DetailCard from "../Components/DetailCard";
-import SettingCard from "../Components/SettingCard";
-import Spacer from "../Components/Spacer";
+import { StyleSheet } from "react-native";
 import UserRideScreen from "../Components/UserRideScreen";
 import { Context as AuthContext } from "../Context/AuthContext";
-import Data from "../Data";
 
 const MyOfferedRideScreen = () => {
-  const { state } = React.useContext(AuthContext);
-  const item = Data[0];
+  const { state: {userInfo} } = React.useContext(AuthContext);
+  const { offered_rides } = userInfo.rideHistory
+  const { payload } = userInfo;
+  console.log(
+    "00------------------------------ My Offered Ride Screen ------------------------------00"
+  );
+  console.log(offered_rides);
+
+  React.useEffect(() => {
+    console.log(
+      "00------------------------------ My Offered Ride Screen ------------------------------00"
+    );
+    console.log(offered_rides);
+  }, [offered_rides]);
 
   return (
-    <UserRideScreen
+    offered_rides?offered_rides[0].length !==0 ?<UserRideScreen
       status="Offered"
       nameLabel="Name"
-      phoneNumber={"+977 9871234560"}
+      phoneNumber={payload.phoneNumber}
       phoneLabel={"Phone Number"}
-      date={"12/12/2020"}
-      time={"12:00 PM"}
-      origin={"Bhaktapur, Nepal"}
-      destination={"Kathmandu, Nepal"}
-      showUserInfo={true}
-      name={"Abishek Poudel"}
+      date={offered_rides[0].date}
+      time={offered_rides[0].time}
+      origin={offered_rides[0].originName}
+      destination={offered_rides[0].destinationName}
+      showUserInfo={offered_rides.rideType === "book"}
+      name={payload.first_name + " " + payload.last_name}
       handleNo={() => console.log("no")}
       handleYes={() => console.log("yes")}
-    />
+    />:null:null
   );
 };
 

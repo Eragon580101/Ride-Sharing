@@ -4,8 +4,10 @@ import { TouchableOpacity } from "react-native";
 import { Image } from "react-native";
 import * as ImagePickerExpo from "expo-image-picker";
 import { StyleSheet } from "react-native";
+import { LogBox } from 'react-native';
 
 const ImagePicker = ({ setImage, image, title, color }) => {
+  LogBox.ignoreLogs(['Key "cancelled" in']);
   const pickImage = async () => {
     let result = await ImagePickerExpo.launchImageLibraryAsync({
       mediaTypes: ImagePickerExpo.MediaTypeOptions.All,

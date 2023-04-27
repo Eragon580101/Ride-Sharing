@@ -12,14 +12,47 @@ import {
 import DetailCard from "../Components/DetailCard";
 import SettingCard from "../Components/SettingCard";
 import Spacer from "../Components/Spacer";
-import { useRoute } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import BackEnd from "../API/BackEnd";
+import { Context as AuthContext } from "../Context/AuthContext";
 
 const RideDetailsScreen = () => {
   const route = useRoute();
-  const { rideTime } = route.params;
-  console.log(rideTime);
-  
-  return (
+  const navigation = useNavigation();
+  const { rideId } = route.params;
+  const [data, setData] = React.useState(null);
+
+  const { state, updateState } = React.useContext(AuthContext);
+
+  React.useEffect(() => {
+    console.log(
+      "00------------------------------ Ride Details Screen ------------------------------00"
+    );
+    getInfo();
+  }, [rideId]);
+
+  const getInfo = async () => {
+    const formData = new FormData();
+    formData.append("rideId", rideId);
+    formData.append("userId", state.userInfo.payload.id);
+    const response = await BackEnd.post("/rideDetail", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    setData(response.data);
+    console.log(response.data);
+  };
+
+  const changeRideStatus = async () => {
+    const formData = new FormData();
+    formData.append("rideId", rideId);
+    formData.append("userId", state.userInfo.payload.id);
+    updateState(formData);
+    navigation.navigate("Settings", { screen: "MyBookedRide" });
+  };
+
+  return data ? (
     <>
       <SettingCard
         buttonTitle="Book Ride"
@@ -27,15 +60,7 @@ const RideDetailsScreen = () => {
         type="entypo"
         logo="bookmark"
         padding={0}
-        onPress={() =>
-          Alert.alert("Ride Booked", "You will be notified shortly", [
-            {
-              text: "Ok",
-              onPress: () =>
-                navigation.navigate("Settings", { screen: "MyBookedRide" }),
-            },
-          ])
-        }
+        onPress={() => changeRideStatus()}
       >
         <View
           style={{
@@ -49,7 +74,7 @@ const RideDetailsScreen = () => {
             style={styles.background}
           />
           <Image
-            source={require("../../assets/CRF250.png")}
+            uri={data.vehicleURL}
             style={{
               width: 100,
               height: 100,
@@ -60,9 +85,14 @@ const RideDetailsScreen = () => {
             }}
           />
           <View>
-            <Text style={styles.userInfoText}>Anish Mahato</Text>
-            <Text style={styles.userInfoText}>CRF RALLY 250</Text>
-            <Text style={styles.userInfoText}>Ba 1 Pa 1234</Text>
+            <Text style={styles.userInfoText}>
+              {data.payload.userData.first_name}{" "}
+              {data.payload.userData.last_name}
+            </Text>
+            <Text style={styles.userInfoText}>
+              {data.payload.rideData.vehicletype}
+            </Text>
+            <Text style={styles.userInfoText}>{data.vehicleNumber}</Text>
           </View>
         </View>
         <Spacer />
@@ -70,35 +100,45 @@ const RideDetailsScreen = () => {
         <Spacer>
           <DetailCard
             firstLabel="From"
-            firstValue="Kathmandu"
+            firstValue={data.payload.rideData.originName}
             secondLabel="To:"
-            secondValue="Pokhara"
+            secondValue={data.payload.rideData.destinationName}
             firstLabelColor="green"
             secondLabelColor="red"
           />
         </Spacer>
         <Spacer bottomBorderWidth={1} />
         <Spacer>
-          <DetailCard firstLabel=" Date" firstValue="2021-05-05" />
+          <DetailCard
+            firstLabel=" Date"
+            firstValue={data.payload.rideData.date}
+          />
         </Spacer>
         <Spacer bottomBorderWidth={1} />
         <Spacer>
-          <DetailCard firstLabel=" Time" firstValue="10:00 AM" />
+          <DetailCard
+            firstLabel=" Time"
+            firstValue={data.payload.rideData.time}
+          />
         </Spacer>
         <Spacer bottomBorderWidth={1} />
         <Spacer>
           <TouchableOpacity
-            onPress={() => Linking.openURL(`tel:${9843123456}`)}
+            onPress={() =>
+              Linking.openURL(`tel:${data.payload.userData.phoneNumber}`)
+            }
           >
             <DetailCard
               firstLabel=" Contact"
-              firstValue="9843123456"
+              firstValue={data.payload.userData.phoneNumber}
               firstLabelColor={"green"}
             />
           </TouchableOpacity>
         </Spacer>
       </SettingCard>
     </>
+  ) : (
+    <Text>Loading...</Text>
   );
 };
 
