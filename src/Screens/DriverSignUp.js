@@ -101,7 +101,6 @@ const DriverSignUp = () => {
   const addToDatabase = async () => {
     addRider();
     addVehicle();
-    await new Promise((resolve) => setTimeout(resolve, 5000));
     () => navigation.navigate("SettingsScreen");
   };
 

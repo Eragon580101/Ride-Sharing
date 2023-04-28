@@ -20,7 +20,7 @@ const MyOfferedRideScreen = () => {
   }, [offered_rides]);
 
   return (
-    offered_rides?offered_rides[0].length !==0 ?<UserRideScreen
+    offered_rides? offered_rides[0] !== undefined ?<UserRideScreen
       status="Offered"
       nameLabel="Name"
       phoneNumber={payload.phoneNumber}

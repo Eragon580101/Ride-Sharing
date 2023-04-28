@@ -15,7 +15,7 @@ const MyRideBookedScreen = () => {
     console.log(booked_rides);
   }, [booked_rides]);
   return (
-    <UserRideScreen
+    booked_rides[0] !== undefined ? <UserRideScreen
       title="My Booked Rides"
       origin={booked_rides[0].originName}
       destination={booked_rides[0].destinationName}
@@ -28,7 +28,7 @@ const MyRideBookedScreen = () => {
       showUserInfo={true}
       vehicleModel={booked_rides[0].vehicleType}
       vehicleModelName="Vehicle Model"
-    />
+    />: null
   );
 };
 
